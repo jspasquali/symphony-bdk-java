@@ -10,6 +10,7 @@ import com.symphony.bdk.core.service.datafeed.EventException;
 import com.symphony.bdk.core.service.datafeed.RealTimeEventListener;
 import com.symphony.bdk.core.service.datafeed.exception.NestedRetryException;
 import com.symphony.bdk.gen.api.DatafeedApi;
+import com.symphony.bdk.gen.api.DatahoseApi;
 import com.symphony.bdk.gen.api.model.UserV2;
 import com.symphony.bdk.gen.api.model.V4Event;
 import com.symphony.bdk.http.api.ApiException;
@@ -39,6 +40,7 @@ abstract class AbstractDatafeedLoop implements DatafeedLoop {
   protected final UserV2 botInfo;
   protected final AtomicBoolean started = new AtomicBoolean();
   protected DatafeedApi datafeedApi;
+  protected DatahoseApi datahoseApi;
   private long lastPullTimestamp;
 
   // access needs to be thread safe (DF loop is usually running on its own thread)

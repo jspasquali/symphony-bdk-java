@@ -11,6 +11,7 @@ import com.symphony.bdk.core.retry.RetryWithRecoveryBuilder;
 import com.symphony.bdk.core.service.OboService;
 import com.symphony.bdk.core.service.message.model.Attachment;
 import com.symphony.bdk.core.service.message.model.Message;
+import com.symphony.bdk.core.service.message.model.SearchTier;
 import com.symphony.bdk.core.service.message.model.SortDir;
 import com.symphony.bdk.core.service.pagination.model.PaginationAttribute;
 import com.symphony.bdk.core.service.stream.constant.AttachmentSort;
@@ -220,13 +221,28 @@ public class MessageService implements OboMessageService, OboService<OboMessageS
    * Searches for messages in the context of a specified user, given an argument-based query.
    *
    * @param query      The search query arguments
-   * @param pagination The skip and limit for pagination. The maximum limit value is 1000.
+   * @param pagination The skip and limit for pagination. The maximum limit value is 1000;
    * @param sortDir    Sorting direction for response. Possible values are desc (default) and asc.
    * @return the list of matching messages
    * @see <a href="https://developers.symphony.com/restapi/reference/message-search-post">Message Search (using POST)</a>
    */
   public List<V4Message> searchMessages(@Nonnull MessageSearchQuery query, @Nullable PaginationAttribute pagination,
       @Nullable SortDir sortDir) {
+    return this.searchMessages(query, pagination, null, null);
+  }
+
+  /**
+   * Searches for messages in the context of a specified user, given an argument-based query.
+   *
+   * @param query      The search query arguments
+   * @param pagination The skip and limit for pagination. The maximum limit value is 1000.
+   * @param sortDir    Sorting direction for response. Possible values are desc (default) and asc.
+   * @param tier       The search tier (hot, warm, all).
+   * @return the list of matching messages
+   * @see <a href="https://developers.symphony.com/restapi/reference/message-search-post">Message Search (using POST)</a>
+   */
+  public List<V4Message> searchMessages(@Nonnull MessageSearchQuery query, @Nullable PaginationAttribute pagination,
+      @Nullable SortDir sortDir, @Nullable SearchTier tier) {
     validateMessageSearchQuery(query);
     return executeAndRetry("searchMessages", messageApi.getApiClient().getBasePath(),
         () -> messagesApi.v1MessageSearchPost(authSession.getSessionToken(), authSession.getKeyManagerToken(), query,
@@ -236,7 +252,8 @@ public class MessageService implements OboMessageService, OboService<OboMessageS
             // "Specifies against which connector to perform the search, either Symphony content or one connector.".
             // We will assume (for now) that it as no real usage.
             null,
-            sortDir != null ? sortDir.name().toLowerCase() : null)
+            sortDir != null ? sortDir.name().toLowerCase() : null,
+            tier != null ? tier.name().toLowerCase() : null)
     );
   }
 
